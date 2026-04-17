@@ -9,7 +9,18 @@ export default defineConfig<TestOptions>({
   },
   
   retries : 1,
-  reporter: 'html',
+  reporter: [
+    process.env.CI ? ["dot"] : ["list"],
+    [
+      "@argos-ci/playwright/reporter",
+      {
+        // Upload to Argos on CI only.
+        uploadToArgos: !!process.env.CI,
+      },
+    ],
+    ['html']
+  
+  ],
 
   use: {
      globalsQaURL: 'https://www.globalsqa.com/demo-site/draganddrop/',
@@ -18,6 +29,7 @@ export default defineConfig<TestOptions>({
             : 'http://localhost:4200/',
 
     trace: 'on-first-retry',
+    screenshot: "only-on-failure",
     actionTimeout: 20000,
     navigationTimeout: 25000,
     video: 'off'
